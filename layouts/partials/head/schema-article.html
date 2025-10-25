@@ -18,15 +18,20 @@
   {{ end -}}
   "datePublished": {{ .PublishDate.Format $iso8601 }},
   "dateModified": {{ .Lastmod.Format $iso8601 }},
-  {{ with .Params.authors -}}
-  {{ with (index (.) 0) -}}
-  "author": {
-    "@type": "Person",
-    "name": "{{ . }}"{{ with $.Site.GetPage (printf "/authors/%s" . ) }},
-    "url": "{{ .Permalink }}"{{ end}}
-  },
-  {{ end -}}
-  {{ end -}}
+  {{- if .Params.authors }}
+  "author": [
+    {{- range $index, $author := .Params.authors }}
+      {{- if $index }},{{ end }}
+      {
+        "@type": "Person",
+        "name": "{{ $author }}"
+        {{- with $.Site.GetPage (printf "/authors/%s" $author) }}
+        , "url": "{{ .Permalink }}"
+        {{- end }}
+      }
+    {{- end }}
+  ],
+  {{- end }}
   "mainEntityOfPage": {{ .Site.BaseURL }},
   "publisher": {
     "@type": "Organization",
